@@ -2,20 +2,20 @@ import pandas as pd
 import numpy as np
 
 # Load data
-wo = pd.read_csv(r"F:\DNN Assgiment\DNN-Project1\Assignment_1\Assignment_1\Task_1\a\w.csv", header=None)
-b0 = pd.read_csv(r"F:\DNN Assgiment\DNN-Project1\Assignment_1\Assignment_1\Task_1\a\b.csv", header=None)
+weights = pd.read_csv(r"F:\DNN Assgiment\DNN-Project1\Assignment_1\Assignment_1\Task_1\a\w.csv", header=None)
+bias = pd.read_csv(r"F:\DNN Assgiment\DNN-Project1\Assignment_1\Assignment_1\Task_1\a\b.csv", header=None)
 
 # Extract weights and biases
-weights_btw_layer0_to_layer1 = wo.iloc[:14, 1:].values  #(14, 100)
-bias_for_layer1 = b0.iloc[:1, 1:].values  #(100,)
+weights_layer0_to_layer1 = weights.iloc[:14, 1:].values  #(14, 100)
+bias_layer1 = bias.iloc[:1, 1:].values  #(100,)
 
-weights_btw_layer1_to_layer2 = wo.iloc[14:114, 1:41].values   #100,40
-bias_for_layer2 = b0.iloc[1:2,1:41].values  #(40,)
+weights_btw_layer1_to_layer2 = weights.iloc[14:114, 1:41].values   #100,40
+bias_layer2 = bias.iloc[1:2,1:41].values  #(40,)
 
-weights_btw_layer2_to_layer3 = wo.iloc[114:, 1:5].values   #40,4
-bias_for_layer3 = b0.iloc[2:,1:5].values  #(4,)
+weights_btw_layer2_to_layer3 = weights.iloc[114:, 1:5].values   #40,4
+bias_layer3 = bias.iloc[2:,1:5].values  #(4,)
 
-initial_params = weights_btw_layer0_to_layer1, bias_for_layer1, weights_btw_layer1_to_layer2, bias_for_layer2, weights_btw_layer2_to_layer3, bias_for_layer3
+initial_parameters = weights_layer0_to_layer1, bias_layer1, weights_btw_layer1_to_layer2, bias_layer2, weights_btw_layer2_to_layer3, bias_layer3
 
 # Define Neural Network class
 class NeuralNetwork:
@@ -115,7 +115,7 @@ class NeuralNetwork:
 X = pd.DataFrame([-1, 1, 1, 1, -1, -1, 1, -1, 1, 1, -1, -1, 1, 1]).T
 y = pd.DataFrame([3])
 
-nn = NeuralNetwork(initial_params)
+nn = NeuralNetwork(initial_parameters)
 new_parameters = nn.train(X, y, epochs=1, learning_rate=0.1)
 
 print("dweight1", new_parameters[0].shape)
