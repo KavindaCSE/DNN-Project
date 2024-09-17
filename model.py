@@ -20,7 +20,7 @@ initial_parameters = weights_layer0_to_layer1, bias_layer1, weights_btw_layer1_t
 # Define Neural Network class
 class NeuralNetwork:
     def __init__(self, params):
-        self.weight1, self.b1, self.weight2, self.b2, self.weight3, self.b3 = params
+        self.weight1, self.bias1, self.weight2, self.bias2, self.weight3, self.bias3 = params
 
     @staticmethod
     def ReLU(x):
@@ -33,8 +33,8 @@ class NeuralNetwork:
     @staticmethod
     def softmax(x):
         x = np.array(x, dtype=float)
-        max_x = np.amax(x, 1).reshape(x.shape[0], 1)
-        e_x = np.exp(x - max_x)
+        max = np.amax(x, 1).reshape(x.shape[0], 1)
+        e_x = np.exp(x - max)
         return e_x / e_x.sum(axis=1, keepdims=True)
 
     @staticmethod
@@ -48,20 +48,20 @@ class NeuralNetwork:
         return loss
 
     @staticmethod
-    def one_hot_encode(y, num_classes=4):
-        one_hot = np.zeros((y.shape[0], num_classes))
-        y = y.astype(int)
-        one_hot[np.arange(y.shape[0]), y.squeeze()] = 1
-        return one_hot
+    def one_hot_encode(results, num_classes=4):
+        one_hot_encode = np.zeros((y.shape[0], num_classes))
+        results = results.astype(int)
+        one_hot_encode[np.arange(results.shape[0]), results.squeeze()] = 1
+        return one_hot_encode
 
     def forward_propagation(self, X):
-        z1 = np.dot(X, self.weight1) + self.b1
+        z1 = np.dot(X, self.weight1) + self.bias1
         h1 = self.ReLU(z1)
 
-        z2 = np.dot(h1, self.weight2) + self.b2
+        z2 = np.dot(h1, self.weight2) + self.bias2
         h2 = self.ReLU(z2)
 
-        z3 = np.dot(h2, self.weight3) + self.b3
+        z3 = np.dot(h2, self.weight3) + self.bias3
         h3 = self.softmax(z3)
 
         return z1, h1, z2, h2, z3, h3
@@ -74,28 +74,28 @@ class NeuralNetwork:
         dz3 /= X.shape[0]
 
         dweight3 = np.dot(h2.T, dz3)
-        db3 = np.sum(dz3, axis=0, keepdims=True)
+        dbias3 = np.sum(dz3, axis=0, keepdims=True)
 
         # Layer 2 error
         dz2 = np.dot(dz3, self.weight3.T) * self.ReLU_derivative(z2)
         dweight2 = np.dot(h1.T, dz2)
-        db2 = np.sum(dz2, axis=0, keepdims=True)
+        dbias2 = np.sum(dz2, axis=0, keepdims=True)
 
         # Layer 1 error
         dz1 = np.dot(dz2, self.weight2.T) * self.ReLU_derivative(z1)
         dweight1 = np.dot(X.T, dz1)
-        db1 = np.sum(dz1, axis=0, keepdims=True)
+        dbias1 = np.sum(dz1, axis=0, keepdims=True)
 
-        return dweight1, db1, dweight2, db2, dweight3, db3
+        return dweight1, dbias1, dweight2, dbias2, dweight3, dbias3
 
     def update_params(self, grads, learning_rate):
-        dweight1, db1, dweight2, db2, dweight3, db3 = grads
+        dweight1, dbias1, dweight2, dbias2, dweight3, dbias3 = grads
         self.weight1 -= learning_rate * dweight1
-        self.b1 -= learning_rate * db1
+        self.bias1 -= learning_rate * dbias1
         self.weight2 -= learning_rate * dweight2
-        self.b2 -= learning_rate * db2
+        self.bias2 -= learning_rate * dbias2
         self.weight3 -= learning_rate * dweight3
-        self.b3 -= learning_rate * db3
+        self.bias3 -= learning_rate * dbias3
 
     def train(self, X, y, epochs, learning_rate):
         y_one_hot = self.one_hot_encode(y)
@@ -119,8 +119,8 @@ nn = NeuralNetwork(initial_parameters)
 new_parameters = nn.train(X, y, epochs=1, learning_rate=0.1)
 
 print("dweight1", new_parameters[0].shape)
-print("db1", new_parameters[1].shape)
+print("dbias1", new_parameters[1].shape)
 print("dweight2", new_parameters[2].shape)
-print("db2", new_parameters[3].shape)
+print("dbias2", new_parameters[3].shape)
 print("dweight3", new_parameters[4].shape)
-print("db3", new_parameters[5].shape)
+print("dbias3", new_parameters[5].shape)
